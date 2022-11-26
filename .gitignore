@@ -1,2 +1,11 @@
+# Files to ignore by git change tracker
+
+
+# Data directory
 data/*
+
+# Cache files
 *.pyc
+
+# VSCode configurations
+.vscode/*
