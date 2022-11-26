@@ -1,33 +1,22 @@
 
-from pathlib import Path
-from configparser import ConfigParser
-import os
-os.environ["KMP_DUPLICATE_LIB_OK"]="TRUE"
-
-
-config_file = "home.ini"
-local_config_path = "smear-beta\\config\\config.ini"
-home_path = Path.home()
-
-global_config = ConfigParser()
-local_config = ConfigParser()
-global_config.read(home_path.joinpath(config_file))
-local_config.read(
-    Path(global_config["PATH"]["tfg_dir"])
-    .joinpath(local_config_path)
-)
-
+from utils.config import load_config
 from hold_detection.Detector import InstanceSegmentator
+from data_operations import labelbox_ops
 
 def main():
     
-    image_name = "IMG-20221007-WA0006.jpg"
-    detector = InstanceSegmentator()
+    global_config, local_config = load_config()
     
-    detector.on_image(
-        str(Path(local_config["PATH"]["routes"])
-        .joinpath(image_name))
+    client = labelbox_ops.get_labelbox_client(
+        global_config["LABELBOX_API_KEYS"]["hold-detector"]
     )
+    labels = labelbox_ops.get_project_labels(client, "hold-detector")
+    
+    coco_labels = labelbox_ops.labels_to_COCO_format(
+        labels, local_config["PATH"]["labelbox_api_routes"]
+    )
+    
+    
     
 if __name__ == "__main__":
     main()
