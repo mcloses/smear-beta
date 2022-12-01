@@ -4,7 +4,7 @@ data and labels
 """
 
 
-from labelbox import Client
+from labelbox import Client, Project
 from labelbox.data.annotation_types.collection import (
     LabelCollection,
     LabelGenerator,
@@ -26,29 +26,36 @@ def get_labelbox_client(API_KEY: str) -> Client:
     :rtype: labelbox.Client
     """
     
-    return Client(API_KEY)
+    return Client(api_key=API_KEY)
+
+
+def get_project(client: Client, project_id: str) -> Project:
+    """
+    Get project instance from Labelbox
+    
+    :param client: A Labelbox API Client instance
+    :type client: Labelbox.Client
+    :param project_id: ID for the Labelbox project to retrieve
+    :param project_id: str
+    """
+    
+    return client.get_project(project_id)
 
 
 def get_project_labels(
-    client: Client,
-    project_name: str
+    project: Project
 ) -> LabelGenerator:
     """
     Get project labels from API
     
-    :param client: Labelbox API Client
-    :type client: labelbox.Client
-    :param project_name: Project name in Labelbox
-    :type project_name: str
+    :param project: Labelbox API Project
+    :type project: labelbox.Project
     
     :return: The project labels
     :rtype: LabelGenerator
     """
-    
-    project = client.get_project(project_name)
-    labels = project.label_generator()
-    
-    return labels
+        
+    return project.label_generator()
 
 
 def labels_to_COCO_format(
@@ -69,7 +76,7 @@ def labels_to_COCO_format(
     :rtype: CocoInstanceDataset
     """
     
-    coco_labels = COCOConverter.deserialize_instances(
+    coco_labels = COCOConverter.serialize_instances(
         labels=labels,
         image_root=image_export_path,
     )
