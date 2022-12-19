@@ -4,6 +4,9 @@
 # Data directory
 data/*
 
+#Models directory
+model/*
+
 # Cache files
 *.pyc
 
