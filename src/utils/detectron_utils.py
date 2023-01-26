@@ -10,6 +10,8 @@ import cv2
 import matplotlib.pyplot as plt
 from typing import Tuple
 
+from numpy import ndarray
+
 def plot_samples(
     dataset_name: str,
     n_images: int = 1,
@@ -47,7 +49,7 @@ def get_train_cfg(
     cfg.DATALOADER.NUM_WORKERS = 2
     cfg.SOLVER.IMS_PER_BATCH = 2
     cfg.SOLVER.BASE_LR = 0.005
-    cfg.SOLVER.MAX_ITER = 1000
+    cfg.SOLVER.MAX_ITER = 750
     cfg.SOLVER.STEPS = []
     cfg.MODEL.ROI_HEADS.NUM_CLASSES = n_classes
     cfg.MODEL.DEVICE = device
@@ -56,11 +58,10 @@ def get_train_cfg(
     return cfg
         
         
-def on_image(
+def predict(
     image_path: str,
     predictor: DefaultPredictor,
-    image_size: Tuple[int,int] = (20,15),
-):
+) -> ndarray:
     im = cv2.imread(image_path)
     outputs = predictor(im)
     v = Visualizer(
@@ -71,5 +72,4 @@ def on_image(
     )
     v = v.draw_instance_predictions(outputs["instances"].to("cpu"))
     plt.figure(figsize = image_size)
-    plt.imshow(v.get_image())
-    plt.show()
+    return v.get_image()

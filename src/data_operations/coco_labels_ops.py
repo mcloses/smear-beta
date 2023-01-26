@@ -40,4 +40,5 @@ def numpy_masks_to_coco_polygons(
             )
         ]
         for mask in masks_list
+        if mask.sum()!=0
     ]
