@@ -67,9 +67,7 @@ def predict(
     v = Visualizer(
         im[:,:,::-1],
         metadata={},
-        scale=0.5,
         instance_mode=ColorMode.SEGMENTATION,
     )
     v = v.draw_instance_predictions(outputs["instances"].to("cpu"))
-    plt.figure(figsize = image_size)
     return v.get_image()
