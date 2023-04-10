@@ -26,7 +26,7 @@ def coco_polygons_to_numpy_masks(
     return filled_masks
 
 def numpy_masks_to_coco_polygons(
-    masks_list: List[np.ndarray],
+    masks_list: List[np.ndarray]
 ) -> List[List[List[float]]]:
     
     return [

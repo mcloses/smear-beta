@@ -7,6 +7,10 @@ data/*
 #Models directory
 model/*
 
+# YOLO Files
+runs/*
+datasets/*
+
 # Cache files
 *.pyc
 
