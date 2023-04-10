@@ -48,8 +48,8 @@ def get_train_cfg(
     cfg.DATASETS.TEST = (test_dataset_name,)
     cfg.DATALOADER.NUM_WORKERS = 2
     cfg.SOLVER.IMS_PER_BATCH = 2
-    cfg.SOLVER.BASE_LR = 0.005
-    cfg.SOLVER.MAX_ITER = 750
+    cfg.SOLVER.BASE_LR = 0.001
+    cfg.SOLVER.MAX_ITER = 500
     cfg.SOLVER.STEPS = []
     cfg.MODEL.ROI_HEADS.NUM_CLASSES = n_classes
     cfg.MODEL.DEVICE = device
