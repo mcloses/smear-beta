@@ -1,16 +1,44 @@
-from detectron2.data import DatasetCatalog, MetadataCatalog
-from detectron2.utils.visualizer import Visualizer
-from detectron2.config import get_cfg
-from detectron2 import model_zoo
-from detectron2.utils.visualizer import ColorMode
-from detectron2.engine import DefaultPredictor
+"""
+Utils functions related to the detectron2 framework and the instance segmentation tasks.
+"""
 
-import random
+from typing import Dict, Tuple
+
 import cv2
 import matplotlib.pyplot as plt
-from typing import Tuple
+import random
+import numpy as np
 
-from numpy import ndarray
+from torch import TensorType
+
+from detectron2 import model_zoo
+from detectron2.config import get_cfg
+from detectron2.data import DatasetCatalog, MetadataCatalog
+from detectron2.utils.visualizer import ColorMode, Visualizer
+
+def plot_predictions(
+    image : np.ndarray,
+    predictions : Dict[str, TensorType]
+) -> np.ndarray:
+    """
+    Plot predictions on an input image.
+
+    :param image: An input image in the format of an ndarray with shape (H, W, C).
+    :type image: np.ndarray
+    :param predictions: A dictionary containing the predicted instances.
+    :type predictions: Dict[str, TensorType]
+    :return: An ndarray containing the plotted predictions on the input image.
+    :rtype: np.ndarray
+    """
+        
+    v = Visualizer(
+        image[:,:,::-1],
+        metadata={},
+        instance_mode=ColorMode.SEGMENTATION,
+    )
+    v = v.draw_instance_predictions(predictions["instances"].to("cpu"))
+    return v.get_image()
+
 
 def plot_samples(
     dataset_name: str,
@@ -31,7 +59,8 @@ def plot_samples(
         plt.figure(figsize = image_size)
         plt.imshow(v.get_image())
         plt.show()
-        
+
+      
 def get_train_cfg(
     config_file_path: str,
     checkpoint_url: str,
@@ -56,18 +85,3 @@ def get_train_cfg(
     cfg.OUTPUT_DIR = output_dir
     
     return cfg
-        
-        
-def predict(
-    image_path: str,
-    predictor: DefaultPredictor,
-) -> ndarray:
-    im = cv2.imread(image_path)
-    outputs = predictor(im)
-    v = Visualizer(
-        im[:,:,::-1],
-        metadata={},
-        instance_mode=ColorMode.SEGMENTATION,
-    )
-    v = v.draw_instance_predictions(outputs["instances"].to("cpu"))
-    return v.get_image()

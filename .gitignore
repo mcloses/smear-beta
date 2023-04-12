@@ -5,11 +5,12 @@
 data/*
 
 #Models directory
-model/*
+models/*
 
 # YOLO Files
 runs/*
 datasets/*
+train/*
 
 # Cache files
 *.pyc
