@@ -1,0 +1,19 @@
+# Files to ignore by git change tracker
+
+
+# Data directory
+data/*
+
+#Models directory
+models/*
+
+# YOLO Files
+runs/*
+datasets/*
+train/*
+
+# Cache files
+*.pyc
+
+# VSCode configurations
+.vscode/*
