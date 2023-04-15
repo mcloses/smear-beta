@@ -34,7 +34,7 @@ class InstanceSegmentator:
         
         with open(model_cfg_path, mode="rb") as f:
             self.cfg = pickle.load(f)
-        self.cfg.MODEL.WEIGHTS = os.path.join(self.cfg.OUTPUT_DIR, model_file_name)
+        self.cfg.MODEL.WEIGHTS = self.cfg.OUTPUT_DIR+model_file_name
         self.cfg.MODEL.ROI_HEADS.SCORE_THRESH_TEST = confidence_threshold
         self.cfg.MODEL.ROI_HEADS.NMS_THRESH_TEST = nms_threshold
         self.predictor = DefaultPredictor(self.cfg)
