@@ -18,15 +18,15 @@ from detectron2.utils.visualizer import ColorMode, Visualizer
 
 def plot_predictions(
     image : np.ndarray,
-    predictions : Dict[str, TensorType]
+    predictions : TensorType
 ) -> np.ndarray:
     """
     Plot predictions on an input image.
 
     :param image: An input image in the format of an ndarray with shape (H, W, C).
     :type image: np.ndarray
-    :param predictions: A dictionary containing the predicted instances.
-    :type predictions: Dict[str, TensorType]
+    :param predictions: The predicted instances.
+    :type predictions: TensorType
     :return: An ndarray containing the plotted predictions on the input image.
     :rtype: np.ndarray
     """
@@ -34,9 +34,9 @@ def plot_predictions(
     v = Visualizer(
         image[:,:,::-1],
         metadata={},
-        instance_mode=ColorMode.SEGMENTATION,
+        instance_mode=ColorMode.IMAGE_BW,
     )
-    v = v.draw_instance_predictions(predictions["instances"].to("cpu"))
+    v = v.draw_instance_predictions(predictions.to("cpu"))
     return v.get_image()
 
 
