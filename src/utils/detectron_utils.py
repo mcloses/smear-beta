@@ -16,9 +16,16 @@ from detectron2.config import get_cfg
 from detectron2.data import DatasetCatalog, MetadataCatalog
 from detectron2.utils.visualizer import ColorMode, Visualizer
 
+color_mode_dict = {
+    "SEGMENTATION": ColorMode.SEGMENTATION,
+    "IMAGE": ColorMode.IMAGE,
+    "IMAGE_BW": ColorMode.IMAGE_BW
+}
+
 def plot_predictions(
     image : np.ndarray,
-    predictions : TensorType
+    predictions : TensorType,
+    color_mode : str = "SEGMENTATION"
 ) -> np.ndarray:
     """
     Plot predictions on an input image.
@@ -27,6 +34,17 @@ def plot_predictions(
     :type image: np.ndarray
     :param predictions: The predicted instances.
     :type predictions: TensorType
+    :param color_mode: The color mode for which to plot the predictions.
+                       Defaults to "SEGMENTATION".
+
+                       "IMAGE": Picks a random color for every instance 
+                                and overlay segmentations with low opacity.
+                       "SEGMENTATION": Let instances of the same category 
+                                       have similar colors and overlay them 
+                                       with high opacity.
+                       "IMAGE_BW": Same as IMAGE, but convert all areas without 
+                                   masks to gray-scale.
+    :type color_mode: str, optional
     :return: An ndarray containing the plotted predictions on the input image.
     :rtype: np.ndarray
     """
@@ -34,7 +52,7 @@ def plot_predictions(
     v = Visualizer(
         image[:,:,::-1],
         metadata={},
-        instance_mode=ColorMode.IMAGE_BW,
+        instance_mode=color_mode_dict[color_mode],
     )
     v = v.draw_instance_predictions(predictions.to("cpu"))
     return v.get_image()
