@@ -7,7 +7,7 @@ from detectron2.engine import DefaultTrainer
 
 import torch
 
-class DetectorTrainer:
+class HoldSegmentatorTrainer:
     """
     Class for training an object detector model using Detectron2.
     """
