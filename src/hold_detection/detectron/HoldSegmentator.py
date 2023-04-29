@@ -8,7 +8,7 @@ from numpy import ndarray
 from torch import TensorType
 
 
-class InstanceSegmentator:
+class HoldSegmentator:
     """
     Instance segmentator class
     """
@@ -20,7 +20,7 @@ class InstanceSegmentator:
         nms_threshold : float
     ):
         """
-        Instance segmentator class
+        Hold segmentator class
         
         :param model_cfg_path: Path to model configuration file
         :type model_cfg_path: str
