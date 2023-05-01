@@ -7,7 +7,7 @@ convert them to COCO format and save them on the data subdirectory
 import json
 from pathlib import Path
 
-from utils.config import load_config
+from smear_beta_utils.config import load_config
 from data_operations import labelbox_ops
 
 def main():

@@ -2,6 +2,8 @@
 Global and local configuration functions
 """
 
+import sys
+
 from typing import Tuple
 
 from pathlib import Path
@@ -9,9 +11,10 @@ from configparser import ConfigParser
 
 
 def load_config(
+    project_name: str = "smear-beta",
     global_config_file_path: Path = Path.home(),
     global_config_filename: str = "home.ini",
-    local_config_subdirectory: Path = Path("smear-beta\\config\\"),
+    local_config_subdirectory: Path = Path("config\\"),
     local_config_filename: str = "config.ini",
 ) -> Tuple[ConfigParser, ConfigParser]:
     """
@@ -37,9 +40,14 @@ def load_config(
         global_config_file_path.joinpath(global_config_filename)
     )
     local_config.read(
-        Path(global_config["PATH"]["tfg_dir"])
+        Path(global_config["PATH"][project_name])
         .joinpath(local_config_subdirectory)
         .joinpath(local_config_filename)
     )
     
+    for path in local_config["PATH"]:
+        local_config["PATH"][path] = str(Path(
+            global_config["PATH"][project_name]
+        ).joinpath(local_config["PATH"][path]))
+        
     return global_config, local_config
