@@ -1,4 +1,5 @@
 import math
+from pathlib import Path
 import sys
 
 from typing import List
@@ -10,25 +11,13 @@ from scipy.signal import savgol_filter
 import torch
 from torchvision import transforms
 
-from utils.yolo_utils import letterbox
-from utils.yolo_utils import non_max_suppression_kpt
-from utils.yolo_utils import output_to_keypoint, plot_skeleton_kpts
+from smear_beta_utils.yolo_utils import letterbox
+from smear_beta_utils.yolo_utils import non_max_suppression_kpt
+from smear_beta_utils.yolo_utils import output_to_keypoint, plot_skeleton_kpts
 
 class ClimberPoseEstimator:
     """
     """
-    
-    information = {
-        "body_parts": {
-            "left_hand": {"index": 34, "positions": []},
-            "right_hand": {"index": 37, "positions": []},
-            "left_foot": {"index": 52, "positions": []},
-            "right_foot": {"index": 55, "positions": []},
-        },
-        "others": {
-            "left_knee": {"index": 28},
-        }
-    }
     
     def __init__(
         self,
@@ -43,17 +32,30 @@ class ClimberPoseEstimator:
         self.model = self.model.half().to(device)
         _ = self.model.eval()
         
+        self.information = {
+            "body_parts": {
+                "left_hand": {"index": 34, "positions": []},
+                "right_hand": {"index": 37, "positions": []},
+                "left_foot": {"index": 52, "positions": []},
+                "right_foot": {"index": 55, "positions": []},
+            },
+            "others": {
+                "left_knee": {"index": 46},
+            }
+        }
+        
     def estimate_pose(
         self,
         frames: List[np.ndarray],
         scale_factor: int = 1,
         save_result: bool = False,
-        save_result_path: str = None,
+        save_path: str = None,
         save_all_skeleton: bool = False,
     ):
-        self.frames = frames
-        frame_width = int(self.frames[0].shape[1])
-        frame_height = int(self.frames[0].shape[0])
+        torch.cuda.empty_cache()
+
+        frame_width = int(frames[0].shape[1])
+        frame_height = int(frames[0].shape[0])
         
         scale_by = (
             frame_width if frame_width > frame_height
@@ -62,12 +64,16 @@ class ClimberPoseEstimator:
         
         if save_result:
             vid_write_image = letterbox(
-                self.frames[0],
+                frames[0],
                 int(scale_by/scale_factor), stride=64, auto=True
             )[0]
             resize_height, resize_width = vid_write_image.shape[:2]
+            filename = "pose_estimation.mp4"
             out = cv2.VideoWriter(
-                save_result_path,
+                str(
+                    Path(save_path).joinpath(
+                        filename)
+                ),
                 cv2.VideoWriter_fourcc(*'mp4v'), 
                 30,
                 (resize_width, resize_height)
@@ -76,8 +82,7 @@ class ClimberPoseEstimator:
         self.information["others"]["foot_distance_treshold"] = 0
         foot_distance_set = False
 
-        for frame in self.frames:
-            self.frames.append(frame)
+        for frame in frames:
             orig_image = frame
             image = cv2.cvtColor(orig_image, cv2.COLOR_BGR2RGB)
             image = letterbox(
@@ -124,7 +129,7 @@ class ClimberPoseEstimator:
                 ]
                 left_knee_confidence = output[
                     0,
-                    self.information["body_parts"]["left_knee"]["index"]+2]
+                    self.information["others"]["left_knee"]["index"]+2]
                 if (
                     left_foot_confidence>0.75 and
                     left_knee_confidence>0.75
@@ -139,7 +144,7 @@ class ClimberPoseEstimator:
                             ] - 
                             output[
                                 0,
-                                self.information["body_parts"]["left_knee"]["index"]
+                                self.information["others"]["left_knee"]["index"]
                             ]
                         ) ** 2
                         + 
@@ -150,8 +155,8 @@ class ClimberPoseEstimator:
                             ] - 
                             output[
                                 0,
-                                self.information["body_parts"]["left_knee"]["index"]
-                            ]+1
+                                self.information["others"]["left_knee"]["index"]+1
+                            ]
                         ) ** 2
                     ) / 2
                     foot_distance_set = True
@@ -170,7 +175,7 @@ class ClimberPoseEstimator:
     def estimate_significant_frames(
         self,
         save_significant_frames_figure: bool = False,
-        save_figures_path: str = None,
+        save_path: str = None,
         sevgol_frame_window_size: int = 5,
         sevgol_filter_poly_order: int = 2,
     ):
@@ -202,13 +207,23 @@ class ClimberPoseEstimator:
             self.information["body_parts"][part]["significant_frames"] = centers
             
             if save_significant_frames_figure:
-                _ = plt.figure(figsize=(30, 10))
+                title = 'Significant Frames for ' + part
+                filename = title + ".jpg"
+                fig = plt.figure(figsize=(30, 10))
                 plt.plot(smoothed_distances)
                 plt.scatter(centers, smoothed_distances[centers], color='red')
                 plt.xlabel('Time (frames)')
                 plt.ylabel('Normalized ' + part + ' distance moved')
-                plt.title('Significant Frames for ' + part)
-                plt.savefig(save_figures_path + part + '.png')
+                plt.title(title)
+                fig.savefig(
+                    str(
+                        Path(save_path).joinpath(
+                            filename
+                        )
+                    ),
+                    bbox_inches='tight',
+                    dpi=300
+                )
                 
     def get_estimator_output(self):
         return self.information

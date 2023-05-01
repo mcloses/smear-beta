@@ -1,3 +1,24 @@
+"""
+This module provides functions for converting COCO-formatted labels
+to uniclasslabels and for converting COCO-style segmentation
+annotations to binary masks and vice versa.
+
+The coco_labels_to_uniclass function takes COCO-formatted training
+and test labels as inputs and converts the category IDs to uniclass
+format. The new labels are saved as two separate JSON files to the
+specified folder path. This function returns a tuple containing the
+new COCO-formatted training and test labels.
+
+The __coco_polygons_to_numpy_masks function takes a list of segmentation
+polygons in COCO format and converts them to binary masks using OpenCV's
+cv2.fillPoly function. The resulting masks are returned as a list of
+NumPy arrays.
+
+The __numpy_masks_to_coco_polygons function takes a list of binary masks
+and converts them to segmentation polygons in COCO format using OpenCV's
+cv2.findContours function. The resulting polygons are returned as a list
+of lists of lists of floats.
+"""
 
 import numpy as np
 import cv2
@@ -53,6 +74,20 @@ def __coco_polygons_to_numpy_masks(
     fill_value: int = 255,
     background_value: int = 0,
 ) -> List[np.ndarray]:
+    """
+    Convert COCO-style segmentation annotations to binary masks.
+
+    :param polygons_list: A list of segmentation polygons.
+    :type polygons_list: List[List[List[float]]]
+    :param image_size: The size of the image that the segmentation annotations refer to.
+    :type image_size: Tuple[int, int]
+    :param fill_value: The value to fill the inside of the polygons with.
+    :type fill_value: int
+    :param background_value: The value to fill the outside of the polygons with.
+    :type background_value: int
+    :return: A list of binary masks representing the segmentation annotations.
+    :rtype: List[np.ndarray]
+    """
     poly_masks = [
         np.reshape(mask, (-1, 2)) for mask in polygons_list 
     ]
@@ -71,7 +106,14 @@ def __coco_polygons_to_numpy_masks(
 def __numpy_masks_to_coco_polygons(
     masks_list: List[np.ndarray]
 ) -> List[List[List[float]]]:
-    
+    """
+    Convert binary masks to COCO-style segmentation annotations.
+
+    :param masks_list: A list of binary masks representing segmentation annotations.
+    :type masks_list: List[np.ndarray]
+    :return: A list of segmentation polygons.
+    :rtype: List[List[List[float]]]
+    """
     return [
         [
             list(

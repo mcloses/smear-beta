@@ -1,4 +1,4 @@
-ENVNAME = tfg
+ENVNAME = smear-beta
 PYTHONVER = 3.9.7
 
 install:
