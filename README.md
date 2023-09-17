@@ -28,6 +28,11 @@ conda activate smear-beta
 pip install -r requirements.txt
 ```
 
+Download the hold segmentation model from the latest release and place it in the `models/instance_segmentation/detectron2/20230430` directory.
+
+Download the latest YOLOv7 pose estimation weights from the [YOLOv7 repository](https://github.com/WongKinYiu/yolov7) and place them in the `models/pose_estimation/yolov7` directory.
+
+
 ## Usage
 
 To run the implementation a video with the following requirements is needed:
