@@ -1,16 +1,23 @@
 # Files to ignore by git change tracker
 
-
-# Data directory
-data/*
-
-#Models directory
-models/*
+*.mp4
+*.avi
 
 # YOLO Files
 runs/*
 datasets/*
 train/*
+
+# Prototypes
+prototypes/*
+
+# Raw data files
+data/raw/img/holds/*.jpg
+data/raw/img/holds/*.jpeg
+data/raw/img/holds/*.png
+data/raw/img/routes/*.jpg
+data/raw/img/routes/*.jpeg
+data/raw/img/routes/*.png
 
 # Cache files
 *.pyc
