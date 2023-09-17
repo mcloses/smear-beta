@@ -11,6 +11,9 @@ train/*
 # Prototypes
 prototypes/*
 
+# Release files
+release/*
+
 # Raw data files
 data/raw/img/holds/*.jpg
 data/raw/img/holds/*.jpeg
